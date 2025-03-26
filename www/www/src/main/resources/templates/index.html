@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>파이썬과스프링부트를결합한AI테스트용</title>
+</head>
+<body>
+    <h1>Welcome Java</h1>
+
+    <form method="post" enctype="multipart/form-data" id="fileUploadForm">
+        데이터 : <input type="text" name="message" value="test hello"><p></p>
+        파일 : <input type="file" name="file"><p></p>
+        <input type="button" value=" 비동기 요청 ">
+    </form>
+    <div id="result">여기에 요청 결과가 출력되어야 합니다.</div>
+    <a href="ai">실시간 스트리밍</a>
+    <script type="text/javascript">
+        var button = document.querySelector("input[type=button]");
+
+        button.addEventListener("click", function() {
+            var form = document.getElementById("fileUploadForm");
+            var form_data = new FormData(form)
+            button.disabled = true;
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("POST", "http://localhost:8080/java_service", true);
+
+            xhr.onload = function() {
+                if(xhr.status >= 200 && xhr.status < 300) {
+                    var response = JSON.parse(xhr.responseText);
+                    var resultDiv = document.getElementById("result");
+                    resultDiv.innerHTML = response.message + "<br>";
+                    var img_src = "data:image/png;base64," + response.image;
+                    var img = document.createElement("img");
+                    img.src = img_src;
+                    resultDiv.appendChild(img);
+                    button.disabled = false;
+                } else {
+                    console.error("ERROR: " + xhr.statusText);
+                    alert("fail " + xhr.statusText);
+                    button.disabled = false;
+                }
+            }
+
+            xhr.onerror = function() {
+                console.error("ERROR: " + xhr.statusText);
+                alert("fail " + xhr.statusText);
+                button.disabled = false;
+            }
+
+            xhr.send(form_data);
+        })
+    </script>
+</body>
+</html>
